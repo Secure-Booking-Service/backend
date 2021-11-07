@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any:0 */
 import { Schema, model, Model, Document } from 'mongoose';
 import { IAuthenticatorDocument, authenticatorSchema } from './authenticator.schema';
-import { string } from 'joi';
+import Joi from 'joi';
 
 export interface IUserDocument extends Document {
   [_id: string]: any;
@@ -22,4 +22,4 @@ const UserSchema = new Schema({
 
 export const User: Model<IUserDocument> = model<IUserDocument>('User', UserSchema);
 
-export const userUsernameValidationSchema = string().required().email().description('Username of User');
+export const userUsernameValidationSchema = Joi.string().required().email().description('Username of User');

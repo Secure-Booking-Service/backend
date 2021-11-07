@@ -2,9 +2,9 @@
 import { config } from '../configuration/environment';
 import { Schema, model, Model, Document } from 'mongoose';
 import { v4 as uuidv4, validate as validateUUID } from 'uuid';
-import { string, CustomHelpers } from 'joi';
+import Joi, { CustomHelpers } from 'joi';
 
-interface IRegistrationTokenDocument extends Document {
+export interface IRegistrationTokenDocument extends Document {
   [_id: string]: any;
   key: string;
   createdAt: Date;
@@ -28,4 +28,4 @@ const isUUID = (value: string, helper: CustomHelpers) : any => {
   return value;
 };
 
-export const registrationTokenValidationSchema = string().required().custom(isUUID).description('Registration token');
+export const registrationTokenValidationSchema = Joi.string().required().custom(isUUID).description('Registration token');
