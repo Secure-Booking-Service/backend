@@ -8,7 +8,8 @@ import helmet from 'helmet';
 import methodOverride from 'method-override';
 import { loggerMiddleware } from './logger';
 import { router } from '../routes/index.routes';
-import { ApiError, apiMiddleware } from '../utils/api';
+import { ApiError } from '../api/error.class';
+import { apiMiddleware } from '../api/middleware';
 
 export const app = express();
 

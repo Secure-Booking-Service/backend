@@ -1,8 +1,9 @@
 /* eslint @typescript-eslint/no-unused-vars: 0, @typescript-eslint/no-explicit-any: 0  */
 import { Response, Request, NextFunction } from 'express';
-import { ApiResponse, ApiError } from './index';
-import { loggerFile } from '../../configuration/logger';
-import { config } from '../../configuration/environment';
+import { ApiError } from './error.class';
+import { ApiResponse } from './response.class';
+import { loggerFile } from '../configuration/logger';
+import { config } from '../configuration/environment';
 import { HttpError } from 'http-errors';
 
 /**
