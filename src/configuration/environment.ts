@@ -10,9 +10,19 @@ const environemtSchema = Joi.object({
       then: Joi.boolean().default(true),
       otherwise: Joi.boolean().default(false)
     }),
+  MONGO_ENCRYPTION_KEY: Joi.string()
+    .base64()
+    .required()
+    .length(45)
+    .description('Encryption key for database'),
   MONGO_HOST: Joi.string()
     .default('mongodb://db:27017/secure-booking-service')
     .description('Connection string for MongoDB'),
+  MONGO_SIGNING_KEY: Joi.string()
+    .base64()
+    .required()
+    .length(90)
+    .description('Signing key for database'),
   NODE_ENV: Joi.string()
     .allow('development')
     .allow('production')
@@ -52,8 +62,10 @@ if (error) throw new Error(`Config validation error: ${error.message}`);
 export const config = {
   env: envVars.NODE_ENV,
   mongo: {
+    encryptionKey: envVars.MONGO_ENCRYPTION_KEY,
     host: envVars.MONGO_HOST,
     mongooseDebug: envVars.MONGOOSE_DEBUG,
+    signingKey: envVars.MONGO_SIGNING_KEY,
   },
   jwt: {
     secret: envVars.JWT_SECRET,
