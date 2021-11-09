@@ -11,7 +11,7 @@ import { GenerateRegistrationOptionsOpts, generateRegistrationOptions, verifyReg
 import { generateJWToken } from ".";
 
 /**
- * User Input Validation
+ * User input validation
  */
 const registerGetRequestSchema = Joi.object({
   username: userUsernameValidationSchema,

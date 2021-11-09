@@ -9,7 +9,7 @@ import { config } from "../../configuration/environment";
 import { generateJWToken } from ".";
 
 /**
- * User Input Validation 
+ * User input validation 
  */
 const loginGetRequestSchema = Joi.object({
   username: userUsernameValidationSchema,

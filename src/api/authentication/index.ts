@@ -1,3 +1,4 @@
+/* eslint  @typescript-eslint/no-unused-vars: 0 */
 import jwt from 'jsonwebtoken';
 import expressjwt from 'express-jwt';
 import { config } from "../../configuration/environment";
@@ -30,7 +31,6 @@ import { ApiSuccess } from '../success.class';
 /**
  * Returns the jwt from the request header
  *
- * ! export only for unit testing (rewire doesn't work :/ )
  * @param {Request} req
  * @returns {(string | null)} jwt or null
  */
@@ -57,8 +57,6 @@ export const isAuth = expressjwt({
  *          Endpoint Handlers           *
  * **************************************/
 
-/* eslint  @typescript-eslint/no-unused-vars: 0 */
-
 /**
  * Simple endpoint to verify that the user is authenticated
  *
@@ -68,4 +66,5 @@ export const isAuth = expressjwt({
  */
  export function authVerify(req: Request, res: Response, next: NextFunction) {
   const response = new ApiSuccess(200);
+  next(response);
 }
