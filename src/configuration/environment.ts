@@ -20,6 +20,7 @@ const environemtSchema = Joi.object({
     .default('production'),
   JWT_SECRET: Joi.string()
     .required()
+    .min(32)
     .description('Used to validate a jwt. Use a strong secret!'),
   JWT_EXPIRESIN: Joi.string()
     .default('1h')
