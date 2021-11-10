@@ -13,7 +13,7 @@ const environemtSchema = Joi.object({
   MONGO_ENCRYPTION_KEY: Joi.string()
     .base64()
     .required()
-    .length(45)
+    .length(44)
     .description('Encryption key for database'),
   MONGO_HOST: Joi.string()
     .default('mongodb://db:27017/secure-booking-service')
@@ -21,7 +21,7 @@ const environemtSchema = Joi.object({
   MONGO_SIGNING_KEY: Joi.string()
     .base64()
     .required()
-    .length(90)
+    .length(88)
     .description('Signing key for database'),
   NODE_ENV: Joi.string()
     .allow('development')

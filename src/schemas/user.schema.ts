@@ -2,8 +2,9 @@
 import { Schema, model, Model, Document } from 'mongoose';
 import { IAuthenticatorDocument, authenticatorSchema } from './authenticator.schema';
 import { Roles } from '../roles';
-import {  } from 'mongoose-encryption';
+import encryption from 'mongoose-encryption';
 import Joi from 'joi';
+import { defaultEncryption } from '../database.encryption';
 
 export interface IUserDocument extends Document {
   [_id: string]: any;
@@ -24,8 +25,8 @@ const UserSchema = new Schema({
   roles: { type: Array, default: [] }
 });
 
-UserSchema.plugin()
+UserSchema.plugin(encryption, { ...defaultEncryption, excludeFromEncryption: ['email', 'device'], additionalAuthenticatedFields: ['device'] })
 
 export const User: Model<IUserDocument> = model<IUserDocument>('User', UserSchema);
 
-export const userUsernameValidationSchema = Joi.string().required().email().description('Username of User');
+export const userEmailValidationSchema = Joi.string().required().email().description('Username of User');

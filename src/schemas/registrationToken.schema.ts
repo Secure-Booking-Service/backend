@@ -3,6 +3,8 @@ import { config } from '../configuration/environment';
 import { Schema, model, Model, Document } from 'mongoose';
 import { v4 as uuidv4, validate as validateUUID } from 'uuid';
 import Joi, { CustomHelpers } from 'joi';
+import encryption from 'mongoose-encryption';
+import { defaultEncryption } from '../database.encryption';
 
 export interface IRegistrationTokenDocument extends Document {
   [_id: string]: any;
@@ -20,6 +22,8 @@ const registrationTokenSchema = new Schema({
    },
    userIsDeletable: { type: Boolean, default: true },
 });
+
+registrationTokenSchema.plugin(encryption, {...defaultEncryption, encryptedFields: [], additionalAuthenticatedFields: ['userIsDeletable', 'key', 'createdAt']})
 
 export const RegistrationToken: Model<IRegistrationTokenDocument> = model<IRegistrationTokenDocument>('RegistrationToken', registrationTokenSchema);
 

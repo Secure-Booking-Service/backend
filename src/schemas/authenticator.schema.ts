@@ -1,5 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any:0 */
 import { Schema, Document } from 'mongoose';
+import { defaultEncryption } from '../database.encryption';
+import encryption from 'mongoose-encryption';
 
 export interface IAuthenticatorDocument extends Document {
   [_id: string]: any;
@@ -15,3 +17,5 @@ export const authenticatorSchema = new Schema({
   counter: { type: Number, required: true },
   transports: Array,
 });
+
+authenticatorSchema.plugin(encryption, defaultEncryption );

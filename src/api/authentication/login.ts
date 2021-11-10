@@ -4,7 +4,7 @@ import { ApiSuccess } from "../success.class";
 import { NextFunction, Request, Response } from 'express';
 import { loggerFile } from "../../configuration/logger";
 import { generateAuthenticationOptions, verifyAuthenticationResponse } from '@simplewebauthn/server';
-import { IUserDocument, User, userUsernameValidationSchema } from "../../schemas/user.schema";
+import { IUserDocument, User, userEmailValidationSchema } from "../../schemas/user.schema";
 import { config } from "../../configuration/environment";
 import { generateJWToken } from ".";
 
@@ -12,11 +12,11 @@ import { generateJWToken } from ".";
  * User input validation 
  */
 const loginGetRequestSchema = Joi.object({
-  username: userUsernameValidationSchema,
+  email: userEmailValidationSchema,
 });
 
 const loginPostRequestSchema = Joi.object({
-  username: userUsernameValidationSchema,
+  email: userEmailValidationSchema,
   assertionResponse: Joi.object().unknown().required().description('Webauthn challenge')
 });
 
@@ -29,7 +29,7 @@ const loginPostRequestSchema = Joi.object({
  * Handles requests to create a new challenge that is required,
  * to login a user.
  *
- * Expect: username parameter
+ * Expect: email parameter
  *
  * @export
  * @param {Request} req
@@ -42,7 +42,7 @@ const loginPostRequestSchema = Joi.object({
     if (assertionGetRequest.error) throw new ApiError(400, assertionGetRequest.error.message);
 
     // 2. Get user document
-    const userDoc = await User.findOne({ username: assertionGetRequest.value.username });
+    const userDoc = await User.findOne({ email: assertionGetRequest.value.email });
     if (userDoc === null) throw new ApiError(404, 'User not found');
     if (userDoc.device === null || userDoc.device === undefined) throw new ApiError(403, 'User not registered');
 
@@ -86,7 +86,7 @@ const loginPostRequestSchema = Joi.object({
     if (assertionPostRequest.error) throw new ApiError(400, assertionPostRequest.error.message);
 
     // 2. Get user document
-    const userDoc: IUserDocument = await User.findOne({ username: assertionPostRequest.value.username });
+    const userDoc: IUserDocument = await User.findOne({ email: assertionPostRequest.value.email });
     if (userDoc === null) throw new ApiError(404, 'User not found');
     if (userDoc.device === null || userDoc.device === undefined) throw new ApiError(403, 'User not registered');
     if (userDoc.currentChallenge === undefined || userDoc.currentChallenge === null) throw new ApiError(400, 'User has no pending challenge');
