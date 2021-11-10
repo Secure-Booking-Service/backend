@@ -18,4 +18,4 @@ export const authenticatorSchema = new Schema({
   transports: Array,
 });
 
-authenticatorSchema.plugin(encryption, defaultEncryption );
+authenticatorSchema.plugin(encryption, defaultEncryption);
