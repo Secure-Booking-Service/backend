@@ -30,7 +30,7 @@ try {
     });
 
     app.listen(config.port, () => {
-      loggerFile.debug(`server started on ${config.rp.origin}:${config.port} (${config.env})`);
+      loggerFile.debug(`server started on port ${config.port} (${config.env})`);
     });
   });
 
