@@ -5,10 +5,20 @@ import { config } from "../../configuration/environment";
 import { NextFunction, Request } from 'express';
 import { IUserDocument } from '../../schemas/user.schema';
 import { ApiSuccess } from '../success.class';
+import { createHash, Hash } from 'crypto';
 
 /****************************************
  *          Helper functions            *
  * **************************************/
+
+/**
+ * Retruns hash object used to has the email address
+ * @export
+ * @return {Hash} 
+ */
+export function getHash(): Hash {
+  return createHash('sha256'); 
+}
 
 /**
  * Generates a signed jwt token, which contains the user
@@ -17,11 +27,7 @@ import { ApiSuccess } from '../success.class';
  * @param {IUserDocument} user
  * @returns jwt
  */
- export function generateJWToken(user: IUserDocument) {
-  const data = {
-    _id: user._id,
-    name: user.name,
-  };
+ export function generateJWToken(data: { email: string, roles: string[] }) {
   const signature = config.jwt.secret;
   const expiration = config.jwt.expiresIn;
 

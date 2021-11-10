@@ -6,7 +6,7 @@ import { loggerFile } from "../../configuration/logger";
 import { generateAuthenticationOptions, verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { IUserDocument, User, userEmailValidationSchema } from "../../schemas/user.schema";
 import { config } from "../../configuration/environment";
-import { generateJWToken } from ".";
+import { generateJWToken, getHash } from ".";
 
 /**
  * User input validation 
@@ -19,8 +19,6 @@ const loginPostRequestSchema = Joi.object({
   email: userEmailValidationSchema,
   assertionResponse: Joi.object().unknown().required().description('Webauthn challenge')
 });
-
-
 
 
 /**
@@ -42,7 +40,8 @@ const loginPostRequestSchema = Joi.object({
     if (assertionGetRequest.error) throw new ApiError(400, assertionGetRequest.error.message);
 
     // 2. Get user document
-    const userDoc = await User.findOne({ email: assertionGetRequest.value.email });
+    const email = getHash().update(assertionGetRequest.value.email).digest('hex');
+    const userDoc = await User.findOne({ email });
     if (userDoc === null) throw new ApiError(404, 'User not found');
     if (userDoc.device === null || userDoc.device === undefined) throw new ApiError(403, 'User not registered');
 
@@ -86,7 +85,8 @@ const loginPostRequestSchema = Joi.object({
     if (assertionPostRequest.error) throw new ApiError(400, assertionPostRequest.error.message);
 
     // 2. Get user document
-    const userDoc: IUserDocument = await User.findOne({ email: assertionPostRequest.value.email });
+    const email = getHash().update(assertionPostRequest.value.email).digest('hex');
+    const userDoc: IUserDocument = await User.findOne({ email });
     if (userDoc === null) throw new ApiError(404, 'User not found');
     if (userDoc.device === null || userDoc.device === undefined) throw new ApiError(403, 'User not registered');
     if (userDoc.currentChallenge === undefined || userDoc.currentChallenge === null) throw new ApiError(400, 'User has no pending challenge');
@@ -112,7 +112,11 @@ const loginPostRequestSchema = Joi.object({
       authenticator.save();
 
       // 6. Send jwt to user
-      const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(userDoc) });
+      const jwtPayload = {
+        email: assertionPostRequest.value.email,
+        roles: userDoc.roles,
+      }
+      const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(jwtPayload) });
       next(response);
 
     } catch (error) {
