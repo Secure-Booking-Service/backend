@@ -12,7 +12,7 @@ import { createHash, Hash } from 'crypto';
  * **************************************/
 
 /**
- * Retruns hash object used to has the email address
+ * Returns hash object used to hash the email address
  * @export
  * @return {Hash} 
  */
