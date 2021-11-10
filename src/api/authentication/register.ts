@@ -48,8 +48,9 @@ const registerPostRequestSchema = Joi.object({
     if (registrationTokenDoc === null) throw new ApiError(404, 'Registration token not found or expired');
 
     // 3. Get user document; create if it does not exist
-    console.log("Step 1");
-    const userDoc = await User.findOneAndUpdate({ email: attestationGetRequest.value.email }, {}, { upsert: true, new: true });
+    const email = attestationGetRequest.value.email;
+    let userDoc = await User.findOne({ email });
+    if (userDoc === null) userDoc = new User({ email });
     if (userDoc.device) throw new ApiError(403, 'User already registered');
 
     // 4. Create attestation challenge
@@ -70,9 +71,8 @@ const registerPostRequestSchema = Joi.object({
 
     // 5. Save current challenge to user
     userDoc.currentChallenge = attestationOptions.challenge;
-    console.log("Step 2")
     userDoc.save();
-    console.log("Step 3")
+    
     // 4. Done
     const response = new ApiSuccess(200, attestationOptions);
     next(response);

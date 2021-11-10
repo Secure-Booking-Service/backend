@@ -12,6 +12,15 @@ This chapter descibes the development setup
 
 - Run 'git config commit.gpgsign true'
 
+### Setup .env
+Create a `/.env` file based on `./.env.example`
+
+* `JWT_SECRET` choose a random string
+* `RP_ID` choose a random string
+* `RP_ORIGIN` enter the URL where you open the frontend like `http://localhost:8080`
+* `MONGO_ENCRYPTION_KEY` use `openssl rand -base64 32` to generate a value
+* `MONGO_SIGNING_KEY` use `openssl rand -base64 64` to generate a value
+
 ### Installing modules 📁
 Run `npm ci`
 
