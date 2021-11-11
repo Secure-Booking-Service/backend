@@ -4,22 +4,22 @@ import { ApiSuccess } from "../success.class";
 import { loggerFile } from "../../configuration/logger";
 import { config } from "../../configuration/environment";
 import { IAuthenticatorDocument } from "../../schemas/authenticator.schema";
-import { userUsernameValidationSchema, User } from "../../schemas/user.schema";
+import { userEmailValidationSchema, User } from "../../schemas/user.schema";
 import { Request, Response, NextFunction } from 'express';
 import { RegistrationToken, registrationTokenValidationSchema } from "../../schemas/registrationToken.schema";
 import { GenerateRegistrationOptionsOpts, generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server';
-import { generateJWToken } from ".";
+import { generateJWToken, getHash } from ".";
 
 /**
  * User input validation
  */
 const registerGetRequestSchema = Joi.object({
-  username: userUsernameValidationSchema,
+  email: userEmailValidationSchema,
   token: registrationTokenValidationSchema,
 });
 
 const registerPostRequestSchema = Joi.object({
-  username: userUsernameValidationSchema,
+  email: userEmailValidationSchema,
   token: registrationTokenValidationSchema,
   attestationResponse: Joi.object().unknown().required().description('Webauthn challenge')
 });
@@ -31,7 +31,7 @@ const registerPostRequestSchema = Joi.object({
  * Handles requests to create a new challenge that is required
  * to register a new device.
  *
- * Expect: token and username parameter
+ * Expect: token and email parameter
  *
  * @export
  * @param {Request} req
@@ -48,7 +48,9 @@ const registerPostRequestSchema = Joi.object({
     if (registrationTokenDoc === null) throw new ApiError(404, 'Registration token not found or expired');
 
     // 3. Get user document; create if it does not exist
-    const userDoc = await User.findOneAndUpdate({ username: attestationGetRequest.value.username }, {}, { upsert: true, new: true });
+    const email = getHash().update(attestationGetRequest.value.email).digest('hex');
+    let userDoc = await User.findOne({ email });
+    if (userDoc === null) userDoc = new User({ email });
     if (userDoc.device) throw new ApiError(403, 'User already registered');
 
     // 4. Create attestation challenge
@@ -56,7 +58,7 @@ const registerPostRequestSchema = Joi.object({
       rpName: config.rp.name,
       rpID: config.rp.id,
       userID: userDoc._id,
-      userName: userDoc.username.toString(),
+      userName: userDoc.email.toString(),
       timeout: 60000,
       attestationType: 'indirect',
       authenticatorSelection: {
@@ -70,7 +72,7 @@ const registerPostRequestSchema = Joi.object({
     // 5. Save current challenge to user
     userDoc.currentChallenge = attestationOptions.challenge;
     userDoc.save();
-
+    
     // 4. Done
     const response = new ApiSuccess(200, attestationOptions);
     next(response);
@@ -101,7 +103,8 @@ const registerPostRequestSchema = Joi.object({
     if (registrationTokenDoc === null) throw new ApiError(404, 'Registration token not found or expired');
 
     // 3. Get user document
-    const userDoc = await User.findOne({ username: attestationPostRequest.value.username });
+    const email = getHash().update(attestationPostRequest.value.email).digest('hex');
+    const userDoc = await User.findOne({ email });
     if (userDoc === null) throw new ApiError(404, 'User not found');
     if (userDoc.device) throw new ApiError(403, 'User already registered');
     if (userDoc.currentChallenge === undefined || userDoc.currentChallenge === null) throw new ApiError(400, 'User has no pending challenge');
@@ -129,7 +132,11 @@ const registerPostRequestSchema = Joi.object({
       registrationTokenDoc.delete();
 
       // 8. Send jwt to user
-      const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(userDoc) });
+      const jwtPayload = {
+        email: attestationPostRequest.value.email,
+        roles: userDoc.roles,
+      }
+      const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(jwtPayload) });
       next(response);
 
     } catch (error) {
