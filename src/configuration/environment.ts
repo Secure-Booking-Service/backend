@@ -3,7 +3,7 @@ import Joi from 'joi';
 
 loadDotenv();
 
-const environemtSchema = Joi.object({
+const environmentSchema = Joi.object({
   MONGOOSE_DEBUG: Joi.boolean()
     .when('NODE_ENV', {
       is: Joi.string().equal('development'),
@@ -56,7 +56,7 @@ const environemtSchema = Joi.object({
     .description('Unique identifier of the website for webauthn'),
 }).unknown()
 
-const { error, value: envVars } = environemtSchema.validate(process.env);
+const { error, value: envVars } = environmentSchema.validate(process.env);
 if (error) throw new Error(`Config validation error: ${error.message}`);
 
 export const config = {
