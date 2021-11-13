@@ -58,7 +58,7 @@ const registerPostRequestSchema = Joi.object({
       rpName: config.rp.name,
       rpID: config.rp.id,
       userID: userDoc._id,
-      userName: userDoc.email.toString(),
+      userName: attestationGetRequest.value.email,
       timeout: 60000,
       attestationType: 'indirect',
       authenticatorSelection: {
