@@ -2,8 +2,7 @@
 import jwt from 'jsonwebtoken';
 import expressjwt from 'express-jwt';
 import { config } from "../../configuration/environment";
-import { NextFunction, Request } from 'express';
-import { IUserDocument } from '../../schemas/user.schema';
+import { NextFunction, Request, Response } from 'express';
 import { ApiSuccess } from '../success.class';
 import { createHash, Hash } from 'crypto';
 
