@@ -4,6 +4,7 @@ import { NextFunction, Request, Response } from "express";
 import { ApiSuccess } from "../success.class";
 import { ApiError } from "../error.class";
 import { loggerFile } from "../../configuration/logger";
+import { FlightOffer, Flight } from "@secure-booking-service/common-types"
 import Joi from "joi";
 
 /**
@@ -31,6 +32,7 @@ const flightsGetRequestSchema = Joi.object({
     .uppercase()
     .description("IATA code of the destination airport"),
   departureDate: Joi.date()
+    .greater('now')
     .required()
     .iso()
     .raw()
@@ -77,19 +79,34 @@ export async function flightsGetRequest(
       });
 
       // 3. Create return array
-      const flights = result.data.map((flight: any) => {
-        return {
-          id: flight.id,
-          oneWay: flight.oneWay,
-          numberOfBookableSeats: flight.numberOfBookableSeats,
-          stops: flight.itineraries[0].segments.length - 1,
-          price: flight.price.grandTotal,
-          currency: flight.price.currency,
-        };
-      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const flightOffers: FlightOffer[] = result.data.map((flightOffer: any) => (
+        {
+          numberOfBookableSeats: flightOffer.numberOfBookableSeats,
+          stops: flightOffer.itineraries[0].segments.length - 1,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          flights: flightOffer.itineraries[0].segments.map((flight: any) => (
+            {
+              departure: {
+                iataCode: flight.departure.iataCode,
+                at: flight.departure.at
+              },
+
+              arrival: {
+                iataCode: flight.arrival.iataCode,
+                at: flight.arrival.at
+              },
+
+              duration: flight.duration
+            } as Flight
+          )),
+          price: flightOffer.price.grandTotal,
+          currency: flightOffer.price.currency,
+        } as FlightOffer
+      ));
 
       // 4. Done
-      const response = new ApiSuccess(200, flights);
+      const response = new ApiSuccess(200, flightOffers);
       next(response);
     } catch (error) {
       loggerFile.error(error);
