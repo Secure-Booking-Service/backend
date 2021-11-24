@@ -22,7 +22,7 @@ try {
       if (user !== null) return; // An admin already exists!
 
       // No admin has been found -> Create a registration token and print it into the logs
-      new RegistrationToken({ userIsDeletable: false }).save().then((token: IRegistrationTokenDocument) => {
+      new RegistrationToken({ userIsDeletable: false, userIsAdmin: true }).save().then((token: IRegistrationTokenDocument) => {
         loggerFile.info('No administrator found!');
         loggerFile.info(`Use ${token.key} as token to register your user`);
         loggerFile.info(`This token is valid for ${config.registrationTokenLifetime} minutes.`);

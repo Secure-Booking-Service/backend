@@ -11,6 +11,7 @@ export interface IRegistrationTokenDocument extends Document {
   key: string;
   createdAt: Date;
   userIsDeletable: boolean;
+  userIsAdmin: boolean;
 }
 
 const registrationTokenSchema = new Schema({
@@ -20,7 +21,8 @@ const registrationTokenSchema = new Schema({
     default: Date.now,
     expires: config.registrationTokenLifetime,
    },
-   userIsDeletable: { type: Boolean, default: true },
+  userIsDeletable: { type: Boolean, default: true },
+  userIsAdmin: { type: Boolean, default: false },
 });
 
 registrationTokenSchema.plugin(encryption, {...defaultEncryption, encryptedFields: [], additionalAuthenticatedFields: ['userIsDeletable', 'key', 'createdAt']})
