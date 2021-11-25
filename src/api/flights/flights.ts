@@ -110,7 +110,15 @@ export async function flightsGetRequest(
       next(response);
     } catch (error) {
       loggerFile.error(error);
-      throw new ApiError(400, error.code);
+      // Forward amadeus api error response if available
+      if (error.description?.length > 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errorObj = error.description.map((err: any) => (
+          { message: `Amadeus api response: status ${err.status}, code ${err.code}, ${err.title}: ${err.detail}` }
+        ));
+        throw new ApiError(400, errorObj);
+      }
+      throw new ApiError(400, error);
     }
   } catch (err) {
     loggerFile.error(err);
