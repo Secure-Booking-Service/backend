@@ -130,7 +130,7 @@ const registerPostRequestSchema = Joi.object({
       userDoc.deletable = registrationTokenDoc.userIsDeletable;
 
       // 7. Make user to admin if it is the inital admin
-      if (registrationTokenDoc.userIsAdmin) userDoc.roles.push(Roles.ADMIN);
+      if (!registrationTokenDoc.userIsDeletable) userDoc.roles.push(Roles.ADMIN);
 
       // 8. Delete registration token
       registrationTokenDoc.delete();
