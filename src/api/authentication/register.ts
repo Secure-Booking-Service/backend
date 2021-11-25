@@ -9,6 +9,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RegistrationToken, registrationTokenValidationSchema } from "../../schemas/registrationToken.schema";
 import { GenerateRegistrationOptionsOpts, generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { generateJWToken, getHash } from ".";
+import { Roles } from "@secure-booking-service/common-types/Roles";
 
 /**
  * User input validation
@@ -128,14 +129,19 @@ const registerPostRequestSchema = Joi.object({
       // 6. Save whether user is deletable or not
       userDoc.deletable = registrationTokenDoc.userIsDeletable;
 
-      // 7. Delete registration token
+      // 7. Make user to admin if it is the inital admin
+      if (!registrationTokenDoc.userIsDeletable) userDoc.roles.push(Roles.ADMIN);
+
+      // 8. Delete registration token
       registrationTokenDoc.delete();
 
-      // 8. Send jwt to user
+      // 9. Send jwt to user
       const jwtPayload = {
         email: attestationPostRequest.value.email,
         roles: userDoc.roles,
       }
+
+      // 10. Done
       const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(jwtPayload) });
       next(response);
 

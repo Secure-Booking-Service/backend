@@ -1,7 +1,7 @@
 /* eslint @typescript-eslint/no-explicit-any:0 */
 import { Schema, model, Model, Document } from 'mongoose';
 import { IAuthenticatorDocument, authenticatorSchema } from './authenticator.schema';
-import { Roles } from '../roles';
+import { Roles } from '@secure-booking-service/common-types/Roles';
 import encryption from 'mongoose-encryption';
 import Joi from 'joi';
 import { defaultEncryption } from '../database.encryption';

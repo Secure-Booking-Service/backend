@@ -20,7 +20,7 @@ const registrationTokenSchema = new Schema({
     default: Date.now,
     expires: config.registrationTokenLifetime,
    },
-   userIsDeletable: { type: Boolean, default: true },
+  userIsDeletable: { type: Boolean, default: true },
 });
 
 registrationTokenSchema.plugin(encryption, {...defaultEncryption, encryptedFields: [], additionalAuthenticatedFields: ['userIsDeletable', 'key', 'createdAt']})
