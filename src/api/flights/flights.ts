@@ -9,7 +9,7 @@ import Joi from "joi";
 /**
  * User input validation
  */
-const flightsGetRequestSchema = Joi.object({
+const flightsGetRequestQuerySchema = Joi.object({
   originLocationCode: Joi.string()
     .required()
     .length(3)
@@ -47,24 +47,20 @@ const flightsGetRequestSchema = Joi.object({
  * @param {Request} req
  * @param {Response} res
  */
-export async function flightsGetRequest(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export async function flightsGetRequest(req: Request, res: Response, next: NextFunction) {
   try {
     // 1. Validate user input
-    const assertionGetRequest = flightsGetRequestSchema.validate(req.query);
-    if (assertionGetRequest.error)
-      throw new ApiError(400, assertionGetRequest.error.message);
+    const flightsGetRequestQuery = flightsGetRequestQuerySchema.validate(req.query);
+    if (flightsGetRequestQuery.error)
+      throw new ApiError(400, flightsGetRequestQuery.error.message);
 
     try {
       // 2. Call Amadeus API
       const result = await amadeus.shopping.flightOffersSearch.get({
-        originLocationCode: assertionGetRequest.value.originLocationCode,
-        destinationLocationCode: assertionGetRequest.value.destinationLocationCode,
-        departureDate: assertionGetRequest.value.departureDate,
-        adults: assertionGetRequest.value.adults,
+        originLocationCode: flightsGetRequestQuery.value.originLocationCode,
+        destinationLocationCode: flightsGetRequestQuery.value.destinationLocationCode,
+        departureDate: flightsGetRequestQuery.value.departureDate,
+        adults: flightsGetRequestQuery.value.adults,
       });
 
       // 3. Create return array
@@ -102,10 +98,10 @@ export async function flightsGetRequest(
       // Forward amadeus api error response if available
       if (error.description?.length > 0) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorObj = error.description.map((err: any) => (
+        const errors = error.description.map((err: any) => (
           { message: `Amadeus api response: status ${err.status}, code ${err.code}, ${err.title}: ${err.detail}` }
         ));
-        throw new ApiError(400, errorObj);
+        throw new ApiError(424, errors);
       }
       throw new ApiError(400, error);
     }

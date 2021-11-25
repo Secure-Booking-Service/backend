@@ -10,4 +10,4 @@ router.use(isAuth);
 
 // EVERYTHING BELOW REQUIRES AUTHENTICATION!
 router.use('/user', userRoutes);
-router.use('/flights', flightsGetRequest);
+router.get('/flights', flightsGetRequest);
