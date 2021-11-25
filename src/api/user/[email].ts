@@ -10,7 +10,7 @@ import { getHash } from '../authentication';
 /**
  * User Input Validation
  */
-const emailPutRequestHeaderSchema = Joi.object({
+const emailPutRequestParamsSchema = Joi.object({
   email: userEmailValidationSchema,
 }).unknown();
 
@@ -37,15 +37,15 @@ const emailPutRequestBodySchema = Joi.object({
 export async function emailPutRequest(req: Request, res: Response, next: NextFunction) {
   try {
     // 1. Validate email 
-    const putRequestHeader = emailPutRequestHeaderSchema.validate(req.params);
-    if (putRequestHeader.error) throw new ApiError(400, putRequestHeader.error.message);
+    const putRequestParams = emailPutRequestParamsSchema.validate(req.params);
+    if (putRequestParams.error) throw new ApiError(400, putRequestParams.error.message);
 
     // 2. Validate body
     const putRequestBody = emailPutRequestBodySchema.validate(req.body);
     if (putRequestBody.error) throw new ApiError(400, putRequestBody.error.message);
 
     // 3. Get user document
-    const email = getHash().update(putRequestHeader.value.email).digest('hex');
+    const email = getHash().update(putRequestParams.value.email).digest('hex');
     const user = await User.findOne({ email });
     if (user === null) throw new ApiError(404, 'User not found');
     
