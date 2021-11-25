@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 import { User, userEmailValidationSchema } from '../../schemas/user.schema';
-import { Roles } from '../../roles';
+import { Roles } from '@secure-booking-service/common-types/Roles';
 import { ApiError } from '../error.class';
 import { ApiSuccess } from '../success.class';
 import { loggerFile } from '../../configuration/logger';

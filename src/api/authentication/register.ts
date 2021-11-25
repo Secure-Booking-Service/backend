@@ -9,7 +9,7 @@ import { Request, Response, NextFunction } from 'express';
 import { RegistrationToken, registrationTokenValidationSchema } from "../../schemas/registrationToken.schema";
 import { GenerateRegistrationOptionsOpts, generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { generateJWToken, getHash } from ".";
-import { Roles } from "../../roles";
+import { Roles } from "@secure-booking-service/common-types/Roles";
 
 /**
  * User input validation

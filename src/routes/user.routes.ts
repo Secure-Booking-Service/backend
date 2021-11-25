@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Roles } from '../roles';
+import { Roles } from '@secure-booking-service/common-types/Roles';
 import { hasRole } from '../api/authentication';
 import { emailPutRequest } from '../api/user/[email]';
 

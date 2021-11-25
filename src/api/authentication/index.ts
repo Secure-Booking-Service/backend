@@ -5,7 +5,7 @@ import { config } from "../../configuration/environment";
 import { NextFunction, Request, Response } from 'express';
 import { ApiSuccess } from '../success.class';
 import { createHash, Hash } from 'crypto';
-import { Roles } from '../../roles';
+import { Roles } from '@secure-booking-service/common-types/Roles';
 import { ApiError } from '../error.class';
 
 interface JSONWebToken { 
