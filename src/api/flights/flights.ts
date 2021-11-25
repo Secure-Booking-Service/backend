@@ -1,21 +1,10 @@
-import { config } from "../../configuration/environment";
-import Amadeus from "amadeus";
+import amadeus from "../../configuration/amadeus";
 import { NextFunction, Request, Response } from "express";
 import { ApiSuccess } from "../success.class";
 import { ApiError } from "../error.class";
 import { loggerFile } from "../../configuration/logger";
 import { FlightOffer, Flight } from "@secure-booking-service/common-types"
 import Joi from "joi";
-
-/**
- * The base Amadeus api object
- */
-export const amadeus = new Amadeus({
-  clientId: config.amadeusApi.key,
-  clientSecret: config.amadeusApi.secret,
-  logger: loggerFile,
-  logLevel: config.env === "development" ? "debug" : "silent",
-});
 
 /**
  * User input validation
