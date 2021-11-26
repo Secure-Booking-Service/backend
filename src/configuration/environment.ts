@@ -54,6 +54,12 @@ const environmentSchema = Joi.object({
     .uri()
     .required()
     .description('Unique identifier of the website for webauthn'),
+  AMADEUS_API_KEY: Joi.string()
+    .required()
+    .description('Api key for the Amadeus flights api'),
+  AMADEUS_API_SECRET: Joi.string()
+    .required()
+    .description('Api secret for the Amadeus flights api'),
 }).unknown()
 
 const { error, value: envVars } = environmentSchema.validate(process.env);
@@ -77,5 +83,9 @@ export const config = {
     name: envVars.RP_NAME,
     id: envVars.RP_ID,
     origin: envVars.RP_ORIGIN,
-  }
+  },
+  amadeusApi: {
+    key: envVars.AMADEUS_API_KEY,
+    secret: envVars.AMADEUS_API_SECRET,
+  },
 }
