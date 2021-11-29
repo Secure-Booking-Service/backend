@@ -37,6 +37,7 @@
     "@types/jsonwebtoken": "^8.5.5",
     "@types/method-override": "^0.0.32",
     "@types/uuid": "^8.3.1",
+    "@types/validator": "^13.7.0",
     "@typescript-eslint/eslint-plugin": "^5.2.0",
     "@typescript-eslint/parser": "^5.2.0",
     "concurrently": "^6.3.0",
@@ -64,6 +65,7 @@
     "method-override": "^3.0.0",
     "mongoose": "^6.0.12",
     "mongoose-encryption": "^2.1.1",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "validator": "^13.7.0"
   }
 }
