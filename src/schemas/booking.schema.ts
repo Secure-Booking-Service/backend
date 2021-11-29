@@ -17,9 +17,9 @@ export const bookingSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-  createdBy: { type: String, required: true },
+  createdBy: { type: String, required: true, index: true },
 });
 
-bookingSchema.plugin(encryption, defaultEncryption);
+bookingSchema.plugin(encryption, { ...defaultEncryption, excludeFromEncryption: ['createdAt', 'createdBy'], additionalAuthenticatedFields: ['createdAt', 'createdBy']});
 
 export const Booking: Model<IBookingDocument> = model<IBookingDocument>('Booking', bookingSchema);
