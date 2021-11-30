@@ -87,7 +87,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     await booking.save();
 
     // 6. Done - return booking
-    const response = new ApiSuccess(200, booking);
+    const response = new ApiSuccess(200, booking._id);
     next(response);
 
   } catch (err) {
