@@ -35,7 +35,7 @@ const flightOfferSchema = Joi.object({
   flights: Joi.array().required().min(1).items(Joi.object({
     duration: Joi.string().required().isoDuration(),
     departure: flightsAirportSchema("IATA code of the departing airport"),
-    arrival: flightsAirportSchema("IATA code of the departing airport"),
+    arrival: flightsAirportSchema("IATA code of the arriving airport"),
   }))
 }).required();
 
