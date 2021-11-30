@@ -29,16 +29,16 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     const postRequestBody = bookingsPostRequestBodySchema.validate(req.body);
     if (postRequestBody.error) throw new ApiError(400, postRequestBody.error.message);
     
-    // 2. Validate credit card expire date
+    // 2. Validate credit card number 
+    if (!isCreditCard((postRequestBody.value as IBooking).creditCard.number))
+      throw new ApiError(402, "Invalid credit card number!");
+
+    // 3. Validate credit card expire date
     const today = new Date()
     const [ expireMonth, expireYear ]: string[] = ((postRequestBody.value as IBooking).creditCard.expire as string).split('/')
     if (parseInt(expireMonth) < today.getMonth()+1 && parseInt('20' + expireYear) <= today.getFullYear())
       throw new ApiError(402, "Credit card expired!");
-
-    // 3. Validate credit card number 
-    if (!isCreditCard((postRequestBody.value as IBooking).creditCard.number))
-      throw new ApiError(402, "Invalid credit card number!");
-  
+    
     // 4. Validate flight offer
     const { at: departureDate, iataCode: originLocationCode } = (postRequestBody.value as IBooking).flightOffer.flights.at(0).departure
     const destinationLocationCode = (postRequestBody.value as IBooking).flightOffer.flights.at(-1).arrival.iataCode
