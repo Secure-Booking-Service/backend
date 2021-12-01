@@ -80,7 +80,12 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     // 5. Create booking
     const booking = new Booking({
-      record: postRequestBody.value,
+      record: {
+        ...postRequestBody.value,
+        user: req.token.data.email,
+        from: originLocationCode,
+        to: destinationLocationCode
+      },
       createdBy: getHash().update(req.token.data.email).digest('hex'), 
     });
     
