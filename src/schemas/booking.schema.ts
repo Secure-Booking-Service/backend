@@ -1,12 +1,12 @@
 /* eslint @typescript-eslint/no-explicit-any:0 */
 import { Schema, Document, Model, model } from 'mongoose';
 import { defaultEncryption } from '../database.encryption';
-import { DatabaseBooking as IDatabaseBooking } from '@secure-booking-service/common-types';
+import { Booking as IBooking } from '@secure-booking-service/common-types';
 import encryption from 'mongoose-encryption';
 
 export interface IBookingDocument extends Document {
   [_id: string]: any;
-  record: IDatabaseBooking;
+  record: IBooking;
   createdAt: Date;
   createdBy: string;
 }
