@@ -23,7 +23,7 @@ const passengersSchema = Joi
       dateOfBirth: Joi.date().required().less('now').iso().raw(),
       firstName: nameSchema,
       lastName: nameSchema,
-      gender: Joi.string().required().length(1).uppercase().pattern(/^W|M|D$/),
+      gender: Joi.string().required().length(1).uppercase().pattern(/^[WMD]$/),
     })
   ).min(1);
 
@@ -44,3 +44,7 @@ export const bookingsPostRequestBodySchema = Joi.object({
   passengers: passengersSchema,
   flightOffer: flightOfferSchema,
 }).required();
+
+export const bookingsDeleteRequestParamsSchema = Joi.object({
+  id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
+}).unknown();
