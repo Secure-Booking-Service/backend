@@ -6,7 +6,7 @@ import { Booking } from '../../schemas/booking.schema';
 import { getHash, JWT } from '../authentication';
 import { bookingsPostRequestBodySchema } from './validations';
 import isCreditCard from 'validator/lib/isCreditCard';
-import { Booking as IBooking, FlightOffer } from '@secure-booking-service/common-types';
+import { BookingDraft, FlightOffer } from '@secure-booking-service/common-types';
 import { searchFlights } from '../flights/flights';
 
 /****************************************
@@ -30,19 +30,19 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     if (postRequestBody.error) throw new ApiError(400, postRequestBody.error.message);
     
     // 2. Validate credit card number 
-    if (!isCreditCard((postRequestBody.value as IBooking).creditCard.number))
+    if (!isCreditCard((postRequestBody.value as BookingDraft).creditCard.number))
       throw new ApiError(402, "Invalid credit card number!");
 
     // 3. Validate credit card expire date
     const today = new Date()
-    const [ expireMonth, expireYear ]: string[] = ((postRequestBody.value as IBooking).creditCard.expire as string).split('/')
+    const [ expireMonth, expireYear ]: string[] = ((postRequestBody.value as BookingDraft).creditCard.expire as string).split('/')
     if (parseInt(expireMonth) < today.getMonth()+1 && parseInt('20' + expireYear) <= today.getFullYear())
       throw new ApiError(402, "Credit card expired!");
     
     // 4. Validate flight offer
-    const { at: departureDate, iataCode: originLocationCode } = (postRequestBody.value as IBooking).flightOffer.flights.at(0).departure
-    const destinationLocationCode = (postRequestBody.value as IBooking).flightOffer.flights.at(-1).arrival.iataCode
-    const adults = (postRequestBody.value as IBooking).passengers.length;
+    const { at: departureDate, iataCode: originLocationCode } = (postRequestBody.value as BookingDraft).flightOffer.flights.at(0).departure
+    const destinationLocationCode = (postRequestBody.value as BookingDraft).flightOffer.flights.at(-1).arrival.iataCode
+    const adults = (postRequestBody.value as BookingDraft).passengers.length;
     
     const result = await searchFlights(
       originLocationCode,
@@ -51,7 +51,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
       adults
     );
 
-    const requestedFlightOffer: FlightOffer = (postRequestBody.value as IBooking).flightOffer;
+    const requestedFlightOffer: FlightOffer = (postRequestBody.value as BookingDraft).flightOffer;
 
     const offerIsValid = result.some((offer) => {
       if (offer.stops !== requestedFlightOffer.stops) return false;
@@ -80,7 +80,12 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     // 5. Create booking
     const booking = new Booking({
-      record: postRequestBody.value,
+      record: {
+        ...postRequestBody.value,
+        user: req.token.data.email,
+        from: originLocationCode,
+        to: destinationLocationCode
+      },
       createdBy: getHash().update(req.token.data.email).digest('hex'), 
     });
     

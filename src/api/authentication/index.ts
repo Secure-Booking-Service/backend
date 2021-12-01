@@ -59,11 +59,11 @@ export function generateJWToken(data: JSONWebToken) {
  * @param {Response} res
  * @param {NextFunction} next
  */
-export function hasRole(role: Roles): (req: Request, res: Response, next: NextFunction) => void {
+export function hasRoles(...roles: Roles[]): (req: Request, res: Response, next: NextFunction) => void {
   return (req: Request & JWT, res: Response, next: NextFunction) => {
-    req.token.data.roles.indexOf(role) === -1
-    ? next(new ApiError(403, "User has not the required privileges to perform this action!"))
-    : next();
+    roles.some(role => req.token.data.roles.includes(role))
+    ? next()
+    : next(new ApiError(403, "User has not the required privileges to perform this action!"));
   }
 }
 
