@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Secure-Booking-Service/backend#readme",
   "devDependencies": {
-    "@secure-booking-service/common-types": "^0.6.0",
+    "@secure-booking-service/common-types": "^0.7.0",
     "@types/body-parser": "^1.19.1",
     "@types/compression": "^1.7.2",
     "@types/cookie-parser": "^1.4.2",
