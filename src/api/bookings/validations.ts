@@ -48,3 +48,7 @@ export const bookingsPostRequestBodySchema = Joi.object({
 export const bookingsDeleteRequestParamsSchema = Joi.object({
   id: Joi.string().regex(/^[0-9a-fA-F]{24}$/).required(),
 }).unknown();
+
+export const bookingsGetRequestQuerySchema = Joi.object({
+  filter: Joi.string().email()
+});

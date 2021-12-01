@@ -4,9 +4,9 @@ import { ApiSuccess } from '../success.class';
 import { loggerFile } from '../../configuration/logger';
 import { Booking } from '../../schemas/booking.schema';
 import { getHash, JWT } from '../authentication';
-import { bookingsDeleteRequestParamsSchema, bookingsPostRequestBodySchema } from './validations';
+import { bookingsDeleteRequestParamsSchema, bookingsGetRequestQuerySchema, bookingsPostRequestBodySchema } from './validations';
 import isCreditCard from 'validator/lib/isCreditCard';
-import { BookingDraft, FlightOffer } from '@secure-booking-service/common-types';
+import { BookingDraft, FlightOffer, Booking as IBooking } from '@secure-booking-service/common-types';
 import { searchFlights } from '../flights/flights';
 
 
@@ -73,15 +73,15 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     // 3. Validate credit card expire date
     const today = new Date()
-    const [ expireMonth, expireYear ]: string[] = (postRequestBody.value as BookingDraft).creditCard.expire.split('/')
-    if (parseInt(expireMonth) < today.getMonth()+1 && parseInt('20' + expireYear) <= today.getFullYear())
+    const [expireMonth, expireYear]: string[] = ((postRequestBody.value as BookingDraft).creditCard.expire).split('/')
+    if (parseInt(expireMonth) < today.getMonth() + 1 && parseInt('20' + expireYear) <= today.getFullYear())
       throw new ApiError(402, "Credit card expired!");
 
     // 4. Validate flight offer
     const { at: departureDate, iataCode: originLocationCode } = (postRequestBody.value as BookingDraft).flightOffer.flights.at(0).departure
     const destinationLocationCode = (postRequestBody.value as BookingDraft).flightOffer.flights.at(-1).arrival.iataCode
     const adults = (postRequestBody.value as BookingDraft).passengers.length;
-    
+
     const result = await searchFlights(
       originLocationCode,
       destinationLocationCode,
@@ -103,7 +103,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
         from: originLocationCode,
         to: destinationLocationCode
       },
-      createdBy: getHash().update(req.token.data.email).digest('hex'), 
+      createdBy: getHash().update(req.token.data.email).digest('hex'),
     });
 
     await booking.save();
@@ -150,6 +150,59 @@ export async function bookingsDeleteRequest(req: Request & JWT, res: Response, n
       loggerFile.error(error.message);
       throw new ApiError(500, 'Failed to delete booking');
     }
+
+  } catch (err) {
+    loggerFile.error(err);
+    next(err);
+  }
+}
+
+
+/**
+ * GET /api/bookings
+ * 
+ * Handles requests to list bookings
+ * 
+ * @export
+ * @param {Request} req
+ * @param {Response} res
+ * @param {NextFunction} next
+ */
+export async function bookingsGetRequest(req: Request & JWT, res: Response, next: NextFunction) {
+  try {
+    // 1. Validate request params
+    const getRequestParams = bookingsGetRequestQuerySchema.validate(req.query);
+    if (getRequestParams.error) throw new ApiError(400, getRequestParams.error.message);
+
+    // 2. Validate role permissions
+    if (!req.token.data.roles.includes(Roles.TRAVELLEAD) && getRequestParams.value.filter !== req.token.data.email)
+      throw new ApiError(403, "User has not the required privileges to get other users bookings!")
+
+    // 3. Get bookings
+    let dbQuery = {};
+    // Filter by email if requested
+    if (getRequestParams.value.filter !== undefined)
+      dbQuery = { createdBy: getHash().update(getRequestParams.value.filter).digest('hex') }
+    const entries = await Booking.find(dbQuery)
+
+    // 4. Create bookings array
+    let bookings: IBooking[] = [];
+    if (entries !== null && entries !== undefined) {
+      bookings = entries.map(model => ({
+        id: model.id,
+        createdAt: model.createdAt.toUTCString(),
+        createdBy: model.record.createdBy,
+        passengers: model.record.passengers,
+        creditCard: model.record.creditCard,
+        from: model.record.from,
+        to: model.record.to,
+        flightOffer: model.record.flightOffer,
+      }));
+    }
+
+    // 5. Return bookings
+    const response = new ApiSuccess(200, bookings);
+    next(response)
 
   } catch (err) {
     loggerFile.error(err);
