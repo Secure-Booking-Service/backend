@@ -3,7 +3,7 @@ import { ApiError } from '../error.class';
 import { ApiSuccess } from '../success.class';
 import { loggerFile } from '../../configuration/logger';
 import { Booking } from '../../schemas/booking.schema';
-import { JWT } from '../authentication';
+import { getHash, JWT } from '../authentication';
 import { bookingsPostRequestBodySchema } from './validations';
 import isCreditCard from 'validator/lib/isCreditCard';
 import { Booking as IBooking, FlightOffer } from '@secure-booking-service/common-types';
@@ -81,7 +81,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     // 5. Create booking
     const booking = new Booking({
       record: postRequestBody.value,
-      createdBy: req.token.data.email 
+      createdBy: getHash().update(req.token.data.email).digest('hex'), 
     });
     
     await booking.save();
