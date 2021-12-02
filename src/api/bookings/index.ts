@@ -8,6 +8,7 @@ import { bookingsDeleteRequestParamsSchema, bookingsGetRequestQuerySchema, booki
 import isCreditCard from 'validator/lib/isCreditCard';
 import { BookingDraft, FlightOffer, Booking as IBooking } from '@secure-booking-service/common-types';
 import { searchFlights } from '../flights/flights';
+import { Roles } from '@secure-booking-service/common-types/Roles';
 
 
 
