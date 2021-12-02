@@ -73,7 +73,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     // 3. Validate credit card expire date
     const today = new Date()
-    const [expireMonth, expireYear]: string[] = ((postRequestBody.value as BookingDraft).creditCard.expire).split('/')
+    const [expireMonth, expireYear]: string[] = (postRequestBody.value as BookingDraft).creditCard.expire.split('/')
     if (parseInt(expireMonth) < today.getMonth() + 1 && parseInt('20' + expireYear) <= today.getFullYear())
       throw new ApiError(402, "Credit card expired!");
 
