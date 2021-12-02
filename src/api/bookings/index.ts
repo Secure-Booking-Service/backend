@@ -32,16 +32,16 @@ function flightOffersAreEqual(offer: FlightOffer, requestedFlightOffer: FlightOf
   if (offer.numberOfBookableSeats < adults) return false;
   if (offer.price !== requestedFlightOffer.price.toString()) return false;
   if (offer.flights.length !== requestedFlightOffer.flights.length) return false;
-  
+
   return offer.flights.every((flight, index) => {
     const requestedFlight = requestedFlightOffer.flights.at(index);
-    
+
     if (flight.duration !== requestedFlight.duration) return false;
     if (flight.arrival.iataCode !== requestedFlight.arrival.iataCode) return false;
     if (flight.arrival.at !== requestedFlight.arrival.at) return false;
     if (flight.departure.iataCode !== requestedFlight.departure.iataCode) return false;
     if (flight.departure.at !== requestedFlight.departure.at) return false;
-    
+
     return true;
   });
 }
@@ -91,7 +91,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     const requestedFlightOffer: FlightOffer = (postRequestBody.value as BookingDraft).flightOffer;
 
-    const offerIsValid = result.some((offer) => flightOffersAreEqual(offer, requestedFlightOffer, adults) );
+    const offerIsValid = result.some((offer) => flightOffersAreEqual(offer, requestedFlightOffer, adults));
 
     if (!offerIsValid) throw new ApiError(400, "Flight offer invalid or expired!");
 
