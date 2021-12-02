@@ -100,7 +100,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     const booking = new Booking({
       record: {
         ...postRequestBody.value,
-        user: req.token.data.email,
+        createdBy: req.token.data.email,
         from: originLocationCode,
         to: destinationLocationCode
       },
@@ -194,7 +194,11 @@ export async function bookingsGetRequest(req: Request & JWT, res: Response, next
         createdAt: model.createdAt.toUTCString(),
         createdBy: model.record.createdBy,
         passengers: model.record.passengers,
-        creditCard: model.record.creditCard,
+        creditCard: {
+          holder: model.record.creditCard.holder,
+          expire: model.record.creditCard.expire,
+          number: "XXXXXXXXXXXX" + model.record.creditCard.number.substring(12)
+        },
         from: model.record.from,
         to: model.record.to,
         flightOffer: model.record.flightOffer,
