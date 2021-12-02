@@ -14,6 +14,18 @@ import { searchFlights } from '../flights/flights';
 /****************************************
  *          Helpers Functions           *
  * **************************************/
+
+/**
+ * Compares two flight offers, if their are equal to each other.
+ * An exception is made for the attribute numberOfBookableSeats. 
+ * The function only checks, that enough seats are available 
+ * for the request amount of passengers. 
+ *
+ * @param {FlightOffer} offer Flight offer from amadeus
+ * @param {FlightOffer} requestedFlightOffer Flight offer from request
+ * @param {number} adults Number of passengers
+ * @return {boolean} Offers are equal to each other
+ */
 function flightOffersAreEqual(offer: FlightOffer, requestedFlightOffer: FlightOffer, adults: number): boolean {
   if (offer.stops !== requestedFlightOffer.stops) return false;
   if (offer.currency !== requestedFlightOffer.currency) return false;
