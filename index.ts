@@ -17,8 +17,7 @@ try {
   connectDB(config.mongo.host).then(() => {
     loggerFile.debug('Mongoose connected');
 
-    // TODO: Add filter for ADMIN role
-    User.findOne({ $and: [{ 'device': { $ne: undefined }}, { 'device': { $ne: null }}] }).then(user => {
+    User.findOne({ $and: [{ 'device': { $ne: undefined }}, { 'device': { $ne: null }}]}).then(user => {
       if (user !== null) return; // An admin already exists!
 
       // No admin has been found -> Create a registration token and print it into the logs

@@ -8,7 +8,44 @@ import { bookingsDeleteRequestParamsSchema, bookingsPostRequestBodySchema } from
 import isCreditCard from 'validator/lib/isCreditCard';
 import { BookingDraft, FlightOffer } from '@secure-booking-service/common-types';
 import { searchFlights } from '../flights/flights';
-import { Roles } from '@secure-booking-service/common-types/Roles';
+
+
+
+/****************************************
+ *          Helpers Functions           *
+ * **************************************/
+
+/**
+ * Compares two flight offers, if their are equal to each other.
+ * An exception is made for the attribute numberOfBookableSeats. 
+ * The function only checks, that enough seats are available 
+ * for the request amount of passengers. 
+ *
+ * @param {FlightOffer} offer Flight offer from amadeus
+ * @param {FlightOffer} requestedFlightOffer Flight offer from request
+ * @param {number} adults Number of passengers
+ * @return {boolean} Offers are equal to each other
+ */
+function flightOffersAreEqual(offer: FlightOffer, requestedFlightOffer: FlightOffer, adults: number): boolean {
+  if (offer.stops !== requestedFlightOffer.stops) return false;
+  if (offer.currency !== requestedFlightOffer.currency) return false;
+  if (offer.numberOfBookableSeats < adults) return false;
+  if (offer.price !== requestedFlightOffer.price.toString()) return false;
+  if (offer.flights.length !== requestedFlightOffer.flights.length) return false;
+  
+  return offer.flights.every((flight, index) => {
+    const requestedFlight = requestedFlightOffer.flights.at(index);
+    
+    if (flight.duration !== requestedFlight.duration) return false;
+    if (flight.arrival.iataCode !== requestedFlight.arrival.iataCode) return false;
+    if (flight.arrival.at !== requestedFlight.arrival.at) return false;
+    if (flight.departure.iataCode !== requestedFlight.departure.iataCode) return false;
+    if (flight.departure.at !== requestedFlight.departure.at) return false;
+    
+    return true;
+  });
+}
+
 
 /****************************************
  *          Endpoint Handlers           *
@@ -36,7 +73,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     // 3. Validate credit card expire date
     const today = new Date()
-    const [ expireMonth, expireYear ]: string[] = ((postRequestBody.value as BookingDraft).creditCard.expire as string).split('/')
+    const [ expireMonth, expireYear ]: string[] = (postRequestBody.value as BookingDraft).creditCard.expire.split('/')
     if (parseInt(expireMonth) < today.getMonth()+1 && parseInt('20' + expireYear) <= today.getFullYear())
       throw new ApiError(402, "Credit card expired!");
 
@@ -54,30 +91,9 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
 
     const requestedFlightOffer: FlightOffer = (postRequestBody.value as BookingDraft).flightOffer;
 
-    const offerIsValid = result.some((offer) => {
-      if (offer.stops !== requestedFlightOffer.stops) return false;
-      if (offer.currency !== requestedFlightOffer.currency) return false;
-      if (offer.numberOfBookableSeats < adults) return false;
-      if (offer.price !== requestedFlightOffer.price.toString()) return false;
-      if (offer.flights.length !== requestedFlightOffer.flights.length) return false;
-
-      const allFlightsMatch = offer.flights.every((flight, index) => {
-        const requestedFlight = requestedFlightOffer.flights.at(index);
-
-        if (flight.duration !== requestedFlight.duration) return false;
-        if (flight.arrival.iataCode !== requestedFlight.arrival.iataCode) return false;
-        if (flight.arrival.at !== requestedFlight.arrival.at) return false;
-        if (flight.departure.iataCode !== requestedFlight.departure.iataCode) return false;
-        if (flight.departure.at !== requestedFlight.departure.at) return false;
-
-        return true;
-      });
-
-      return allFlightsMatch;
-    })
+    const offerIsValid = result.some((offer) => flightOffersAreEqual(offer, requestedFlightOffer, adults) );
 
     if (!offerIsValid) throw new ApiError(400, "Flight offer invalid or expired!");
-
 
     // 5. Create booking
     const booking = new Booking({
