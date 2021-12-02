@@ -125,14 +125,7 @@ export async function bookingsDeleteRequest(req: Request & JWT, res: Response, n
       throw new ApiError(404, `Failed to find booking ${deleteRequestParams.value.id}`);
     }
 
-    // 3. Validate roles and permissions
-    const isTravelLead = req.token.data.roles.includes(Roles.TRAVELLEAD);
-    const isForeignBooking = getHash().update(req.token.data.email).digest('hex') !== booking.createdBy;
-    if (!isTravelLead && isForeignBooking) {
-      throw new ApiError(403, "User has not the required privileges to delete this booking!")
-    }
-
-    // 4. Delete booking
+    // 3. Delete booking
     try {
       await booking.deleteOne();
       const response = new ApiSuccess(204);
