@@ -10,6 +10,7 @@ import { loggerMiddleware } from './logger';
 import { router } from '../routes/index.routes';
 import { ApiError } from '../api/error.class';
 import { apiMiddleware } from '../api/middleware';
+import { config } from './environment';
 
 export const app = express();
 
@@ -20,7 +21,12 @@ app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
 app.use(helmet());
-app.use(cors());
+
+// Set cors headers
+const options: cors.CorsOptions = {
+  origin: [config.rp.origin]
+};
+app.use(cors(options));
 
 // Delimit number of requests per minute
 const apiLimiter = rateLimit({
