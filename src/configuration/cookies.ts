@@ -11,7 +11,7 @@ export enum Cookie {
 export const cookieDefaultSettings: CookieOptions = {
   // Do not define "expires", because all are session cookies
   httpOnly: true,
-  secure: false,
+  secure: true,
   domain: config.rp.id,
   sameSite: 'strict',
   path: '/',
