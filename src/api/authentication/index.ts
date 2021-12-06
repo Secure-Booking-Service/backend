@@ -7,6 +7,7 @@ import { ApiSuccess } from '../success.class';
 import { createHash, Hash } from 'crypto';
 import { Roles } from '@secure-booking-service/common-types/Roles';
 import { ApiError } from '../error.class';
+import { Cookie } from '../../configuration/cookies';
 
 interface JSONWebToken { 
   email: string,
@@ -68,17 +69,13 @@ export function hasRoles(...roles: Roles[]): (req: Request, res: Response, next:
 }
 
 /**
- * Returns the jwt from the request header
+ * Returns the jwt from the cookies
  *
  * @param {Request} req
  * @returns {(string | null)} jwt or null
  */
-export function getTokenFromHeader(req: Request): string | null {
-  if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-    return req.headers.authorization.split(' ')[1];
-  }
-
-  return null;
+export function getJSONWebToken(req: Request): string | null {
+  return req.cookies[Cookie.AUTH] ?? null;
 }
 
 /**
@@ -86,7 +83,7 @@ export function getTokenFromHeader(req: Request): string | null {
  */
 export const isAuth = expressjwt({
   algorithms: ['HS256'],
-  getToken: getTokenFromHeader,
+  getToken: getJSONWebToken,
   userProperty: 'token',
   secret: config.jwt.secret,
 });
@@ -103,7 +100,11 @@ export const isAuth = expressjwt({
  * @param {Request} req
  * @param {Response} res
  */
- export function authVerify(req: Request, res: Response, next: NextFunction) {
-  const response = new ApiSuccess(200);
+ export function authVerify(req: Request & JWT, res: Response, next: NextFunction) {
+  const { email, roles } = req.token.data;
+  let expiresIn = req.token.exp * 1000 - Date.now();
+  if (expiresIn < 0) expiresIn = 0;
+  
+  const response = new ApiSuccess(200, { email, roles, expiresIn });
   next(response);
 }

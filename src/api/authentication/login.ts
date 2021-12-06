@@ -7,6 +7,8 @@ import { generateAuthenticationOptions, verifyAuthenticationResponse } from '@si
 import { IUserDocument, User, userEmailValidationSchema } from "../../schemas/user.schema";
 import { config } from "../../configuration/environment";
 import { generateJWToken, getHash } from ".";
+import { Cookie, cookieDefaultSettings } from "../../configuration/cookies";
+import ms from "ms";
 
 /**
  * User input validation 
@@ -116,7 +118,10 @@ const loginPostRequestSchema = Joi.object({
         email: assertionPostRequest.value.email,
         roles: userDoc.roles,
       }
-      const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(jwtPayload) });
+      res.cookie(Cookie.AUTH, generateJWToken(jwtPayload), cookieDefaultSettings);
+      
+      // 7. Done
+      const response = new ApiSuccess(200, { ...jwtPayload, expiresIn: ms(config.jwt.expiresIn) });
       next(response);
 
     } catch (error) {

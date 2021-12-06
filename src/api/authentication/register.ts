@@ -1,4 +1,5 @@
 import Joi from "joi";
+import ms from 'ms';
 import { ApiError } from "../error.class";
 import { ApiSuccess } from "../success.class";
 import { loggerFile } from "../../configuration/logger";
@@ -10,6 +11,7 @@ import { RegistrationToken, registrationTokenValidationSchema } from "../../sche
 import { GenerateRegistrationOptionsOpts, generateRegistrationOptions, verifyRegistrationResponse } from '@simplewebauthn/server';
 import { generateJWToken, getHash } from ".";
 import { Roles } from "@secure-booking-service/common-types/Roles";
+import { Cookie, cookieDefaultSettings } from "../../configuration/cookies";
 
 /**
  * User input validation
@@ -140,9 +142,10 @@ const registerPostRequestSchema = Joi.object({
         email: attestationPostRequest.value.email,
         roles: userDoc.roles,
       }
+      res.cookie(Cookie.AUTH, generateJWToken(jwtPayload), cookieDefaultSettings)
 
       // 10. Done
-      const response = new ApiSuccess(200, { 'accesstoken': generateJWToken(jwtPayload) });
+      const response = new ApiSuccess(200, { ...jwtPayload, expiresIn: ms(config.jwt.expiresIn) });
       next(response);
 
     } catch (error) {
