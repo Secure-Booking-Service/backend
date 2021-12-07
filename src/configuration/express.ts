@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
 app.use(helmet());
-app.use(cors({ origin: [config.rp.origin] }));
+app.use(cors({ origin: [config.rp.origin], credentials: true }));
 
 // Delimit number of requests per minute
 const apiLimiter = rateLimit({
