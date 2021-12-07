@@ -21,24 +21,19 @@ app.use(cookieParser());
 app.use(compress());
 app.use(methodOverride());
 app.use(helmet());
-
-// Set cors headers
-const options: cors.CorsOptions = {
-  origin: [config.rp.origin]
-};
-app.use(cors(options));
+app.use(cors({ origin: [config.rp.origin] }));
 
 // Delimit number of requests per minute
 const apiLimiter = rateLimit({
-    windowMs: 60 * 1000, // 1 minutes
-    max: 100
+  windowMs: 60 * 1000, // 1 minutes
+  max: 100
 });
 
 // only apply to requests that begin with /api/
 app.use('/api/', apiLimiter, router);
 
 // catch 404 and forward to error handler
-app.use((req: Request, res: Response, next: NextFunction, ) => {
+app.use((req: Request, res: Response, next: NextFunction,) => {
   const apiError = new ApiError(404, 'Not found');
   return next(apiError);
 });
