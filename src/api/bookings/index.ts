@@ -67,21 +67,22 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     // 1. Validate body
     const postRequestBody = bookingsPostRequestBodySchema.validate(req.body);
     if (postRequestBody.error) throw new ApiError(400, postRequestBody.error.message);
+    const bookingDraft = postRequestBody.value as BookingDraft;
 
     // 2. Validate credit card number 
-    if (!isCreditCard((postRequestBody.value as BookingDraft).creditCard.number))
+    if (!isCreditCard(bookingDraft.creditCard.number))
       throw new ApiError(402, "Invalid credit card number!");
 
     // 3. Validate credit card expire date
     const today = new Date()
-    const [expireMonth, expireYear]: string[] = (postRequestBody.value as BookingDraft).creditCard.expire.split('/')
+    const [expireMonth, expireYear]: string[] = bookingDraft.creditCard.expire.split('/')
     if (parseInt(expireMonth) < today.getMonth() + 1 && parseInt('20' + expireYear) <= today.getFullYear())
       throw new ApiError(402, "Credit card expired!");
 
     // 4. Validate flight offer
-    const { at: departureDate, iataCode: originLocationCode } = (postRequestBody.value as BookingDraft).flightOffer.flights.at(0).departure
-    const destinationLocationCode = (postRequestBody.value as BookingDraft).flightOffer.flights.at(-1).arrival.iataCode
-    const adults = (postRequestBody.value as BookingDraft).passengers.length;
+    const { at: departureDate, iataCode: originLocationCode } = bookingDraft.flightOffer.flights.at(0).departure
+    const destinationLocationCode = bookingDraft.flightOffer.flights.at(-1).arrival.iataCode
+    const adults = bookingDraft.passengers.length;
 
     const result = await searchFlights(
       originLocationCode,
@@ -90,7 +91,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
       adults
     );
 
-    const requestedFlightOffer: FlightOffer = (postRequestBody.value as BookingDraft).flightOffer;
+    const requestedFlightOffer: FlightOffer = bookingDraft.flightOffer;
 
     const offerIsValid = result.some((offer) => flightOffersAreEqual(offer, requestedFlightOffer, adults));
 
@@ -99,7 +100,7 @@ export async function bookingsPostRequest(req: Request & JWT, res: Response, nex
     // 5. Create booking
     const booking = new Booking({
       record: {
-        ...postRequestBody.value,
+        ...bookingDraft,
         createdBy: req.token.data.email,
         from: originLocationCode,
         to: destinationLocationCode
