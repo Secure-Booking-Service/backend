@@ -17,13 +17,13 @@ import { config } from '../../configuration/environment';
  * @param res Response
  * @param next NextFunction
  */
- export async function addUserPostRequest(req: Request, res: Response, next: NextFunction) {
+ export async function userPostRequest(req: Request, res: Response, next: NextFunction) {
 
   try {
 
       // Create a new registration token
       const token = await new RegistrationToken().save();
-      if (token === null && token === undefined) throw new ApiError(500, 'Unable to create registration token');
+      if (token === null || token === undefined) throw new ApiError(500, 'Unable to create registration token');
 
       // Return token
       const responseBody = {
