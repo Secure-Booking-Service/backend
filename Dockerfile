@@ -15,5 +15,3 @@ FROM gcr.io/distroless/nodejs:16
 ENV NODE_ENV production
 COPY --from=packer /app /app
 CMD [ "/app/index.js" ]
-
-
