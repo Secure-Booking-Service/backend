@@ -1,12 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import Joi from 'joi';
-import { User, userEmailValidationSchema } from '../../schemas/user.schema';
-import { Roles } from '@secure-booking-service/common-types/Roles';
 import { ApiError } from '../error.class';
 import { ApiSuccess } from '../success.class';
 import { loggerFile } from '../../configuration/logger';
-import { getHash } from '../authentication';
-import { IRegistrationTokenDocument, RegistrationToken } from '../../schemas/registrationToken.schema';
+import { RegistrationToken } from '../../schemas/registrationToken.schema';
 import { config } from '../../configuration/environment';
 
 /****************************************
