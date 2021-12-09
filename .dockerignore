@@ -1,0 +1,7 @@
+**/.devcontainer
+**/node_modules
+**/.dockerignore
+**/.env*
+**/dist
+**/log
+**/.vscode

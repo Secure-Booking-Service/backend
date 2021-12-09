@@ -15,6 +15,12 @@ const configLogger = {
           type: 'pattern',
           pattern: '[%d{ISO8601}] %m',
       }},
+      azure: {
+        type: 'stdout',
+        layout: {
+          type: 'pattern',
+          pattern: '%m',
+      }},
       file: {
         type: 'file',
         filename: 'log/server.log',
@@ -26,7 +32,7 @@ const configLogger = {
     }},
     categories: {
       default: { appenders: ['stdout'], level: 'all'},
-      production: { appenders: ['stdout'], level: 'all'},
+      production: { appenders: ['azure'], level: 'all'},
       development: { appenders: ['stdout', 'file'], level: 'all'},
       test: { appenders: ['stdout'], level: 'all'}
     }

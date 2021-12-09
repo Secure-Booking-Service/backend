@@ -7,6 +7,8 @@ import { User } from './src/schemas/user.schema';
 import { RegistrationToken, IRegistrationTokenDocument } from './src/schemas/registrationToken.schema';
 
 try {
+  loggerFile.info('application started');
+
   // print mongoose logs in dev env
   if (config.mongo.mongooseDebug) {
     set('debug', (collectionName: unknown, method: unknown, query: unknown, doc: unknown) => {
