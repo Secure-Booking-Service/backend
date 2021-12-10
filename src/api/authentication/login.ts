@@ -55,6 +55,7 @@ const loginPostRequestSchema = Joi.object({
         type: 'public-key'
       }],
       userVerification: 'preferred',
+      rpID: config.rp.id,
     });
 
     // 4. Save current challenge
