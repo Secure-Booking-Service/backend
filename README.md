@@ -13,8 +13,8 @@
 This section explains the content of the important folder `/src`.
 
 * `/api/*`: This folder contains all endpoint handlers of the api. Its structure mirrors the path of the api endpoints to find the concurrent handler more easily.
-* `/configuration/*`: Contains various configuration files which are loaded at the beginning to setup express, the logger or to validate the environment variables.
-* `/routes/*`: In this folder are all routes listened. These files connect correlating endpoint handlers and their routes. Also these files configures requirements like authentication and authorization.
+* `/configuration/*`: Contains various configuration files which are loaded at the beginning to set up express, the logger or to validate the environment variables.
+* `/routes/*`: This folder contains all routes/endpoints that the backend listens on. These files connect correlating endpoint handlers and their routes. Also these files configure requirements like authentication and authorization.
 * `/schemas/*`: Contains database schema definitions for various collections like users or bookings. 
 
 ## 🧑‍💻 Development Setup
@@ -22,7 +22,7 @@ This section describes the development setup to run the server application local
 Make sure that you have commit signing active for this repository `git config commit.gpgsign true`.
 
 ### Prerequisites ⚗️
-> We have also setup a `.devcontainer`.  [Learn more](https://code.visualstudio.com/docs/remote/containers#_quick-start-open-an-existing-folder-in-a-container)
+> We have also set up a `.devcontainer`.  [Learn more](https://code.visualstudio.com/docs/remote/containers#_quick-start-open-an-existing-folder-in-a-container)
 
 - Local MongoDB installation on port 27017 (https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
 - Node with NPM installed (https://nodejs.org/en/download/)
@@ -39,7 +39,7 @@ Create a `/.env` file based on `./.env.example`
 * `AMADEUS_API_SECRET` API-Secret from [Amadeus Developer Portal](https://developers.amadeus.com/self-service/category/air)
 
 ### 📁 Installing modules
-Run `npm ci` to install required node modules.
+Run `npm ci` to install all required node modules.
 
 ### 🛫 Start development
 Run `npm start` at the root of the directory.
