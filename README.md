@@ -21,7 +21,7 @@ This section explains the content of the important folder `/src`.
 This section describes the development setup to run the server application locally.
 Make sure that you have commit signing active for this repository `git config commit.gpgsign true`.
 
-### Prerequisites ⚗️
+### ⚗️ Prerequisites
 > We have also set up a `.devcontainer`.  [Learn more](https://code.visualstudio.com/docs/remote/containers#_quick-start-open-an-existing-folder-in-a-container)
 
 - Local MongoDB installation on port 27017 (https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/)
